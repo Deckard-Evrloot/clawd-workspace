@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kingdom Defense</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="landing">
+        <h1>Kingdom Defense</h1>
+        <p class="subtitle">Hold the Castle. Defend the Realm.</p>
+        <button id="start-btn">Enter Battle</button>
+    </div>
+
+    <div id="game-container" class="hidden">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="ui-overlay">
+            <div class="stat-box">GOLD <span id="gold-display">0</span></div>
+            <div class="stat-box">LIVES <span id="lives-display">20</span></div>
+            <div class="stat-box">WAVE <span id="wave-display">1</span></div>
+            <button id="restart-btn" style="margin-top: 10px; font-size: 0.8rem; padding: 0.5rem;">RESTART</button>
+        </div>
+
+        <div id="context-menu" class="hidden">
+            <!-- Populated dynamically via JS -->
+        </div>
+
+        <div id="game-over" class="hidden">
+            <h2>FALLEN</h2>
+            <button id="retry-btn">Raise New Army</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
