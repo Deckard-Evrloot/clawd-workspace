@@ -453,27 +453,18 @@ function spawnEnemy() {
     const startY = 11 * TILE_SIZE + TILE_SIZE/2; // Center of path row
 
     // Determine Enemy Type based on Wave
-    let type = 0; // Goblin (Weak)
+    let type = 3; // Wolf (replaces goblin as starting enemy)
     if (gameState.wave >= 4) type = 1; // Orc (Medium)
-    if (gameState.wave >= 6) type = 3; // Wolf (Fast)
     if (gameState.wave >= 8) type = 2; // Skeleton (Hard)
     
     // Mix it up slightly
-    if (gameState.wave >= 4 && Math.random() < 0.3) type = 0;
-    if (gameState.wave >= 6 && Math.random() < 0.3) type = 1;
-    if (gameState.wave >= 8 && Math.random() < 0.3) type = 3;
+    if (gameState.wave >= 4 && Math.random() < 0.3) type = 3;
+    if (gameState.wave >= 8 && Math.random() < 0.3) type = 1;
 
-    // Adjust stats based on type
+    // Base stats
     let baseSpeed = 1.0 + (gameState.wave * 0.1);
     let baseHp = 20 * Math.pow(1.3, gameState.wave);
     let baseBounty = 5 + gameState.wave;
-    
-    // Wolf (type 3): Faster, less HP
-    if (type === 3) {
-        baseSpeed *= 1.8;
-        baseHp *= 0.7;
-        baseBounty *= 1.2;
-    }
     
     gameState.enemies.push({
         x: startX,
