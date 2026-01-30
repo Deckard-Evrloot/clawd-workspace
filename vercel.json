@@ -1,5 +1,0 @@
-{
-  "buildCommand": "cd castle-defense && echo 'Static site, no build needed'",
-  "outputDirectory": "castle-defense",
-  "cleanUrls": true
-}
