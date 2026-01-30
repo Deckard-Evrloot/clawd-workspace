@@ -20,7 +20,8 @@ const ASSETS = {
     towers: new Image(), // Keep old towers for now, or just use colored boxes if broken
     goblin: new Image(),
     orc: new Image(),
-    skeleton: new Image()
+    skeleton: new Image(),
+    wolf: new Image() // Wolf sprite sheet
 };
 
 // Game State
@@ -70,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ASSETS.goblin.src = 'assets/goblin.png';
     ASSETS.orc.src = 'assets/orc.png';
     ASSETS.skeleton.src = 'assets/skeleton.png';
+    ASSETS.wolf.src = 'assets/wolf_run.png'; // Wolf sprite sheet (3 frames)
     ASSETS.towers.src = 'assets/towers.png'; // Legacy
 
     // UI Listeners
@@ -286,11 +288,27 @@ function draw() {
     // 6. Enemies
     gameState.enemies.forEach(enemy => {
         let img = ASSETS.goblin;
+        let isAnimated = false;
+        let frameCount = 1;
+        
         if (enemy.type === 1) img = ASSETS.orc;
         if (enemy.type === 2) img = ASSETS.skeleton;
+        if (enemy.type === 3) {
+            img = ASSETS.wolf;
+            isAnimated = true;
+            frameCount = 3; // Wolf has 3 frames
+        }
 
         if (img && img.complete) {
-            ctx.drawImage(img, enemy.x - 16, enemy.y - 16, 32, 32);
+            if (isAnimated) {
+                // Animated sprite: calculate frame based on time
+                const frameWidth = img.width / frameCount;
+                const frameIndex = Math.floor(gameState.time * 8) % frameCount; // 8 fps animation
+                const sx = frameIndex * frameWidth;
+                ctx.drawImage(img, sx, 0, frameWidth, img.height, enemy.x - 16, enemy.y - 16, 32, 32);
+            } else {
+                ctx.drawImage(img, enemy.x - 16, enemy.y - 16, 32, 32);
+            }
         } else {
             ctx.fillStyle = '#f00';
             ctx.beginPath();
@@ -437,20 +455,34 @@ function spawnEnemy() {
     // Determine Enemy Type based on Wave
     let type = 0; // Goblin (Weak)
     if (gameState.wave >= 4) type = 1; // Orc (Medium)
+    if (gameState.wave >= 6) type = 3; // Wolf (Fast)
     if (gameState.wave >= 8) type = 2; // Skeleton (Hard)
     
     // Mix it up slightly
     if (gameState.wave >= 4 && Math.random() < 0.3) type = 0;
-    if (gameState.wave >= 8 && Math.random() < 0.3) type = 1;
+    if (gameState.wave >= 6 && Math.random() < 0.3) type = 1;
+    if (gameState.wave >= 8 && Math.random() < 0.3) type = 3;
 
+    // Adjust stats based on type
+    let baseSpeed = 1.0 + (gameState.wave * 0.1);
+    let baseHp = 20 * Math.pow(1.3, gameState.wave);
+    let baseBounty = 5 + gameState.wave;
+    
+    // Wolf (type 3): Faster, less HP
+    if (type === 3) {
+        baseSpeed *= 1.8;
+        baseHp *= 0.7;
+        baseBounty *= 1.2;
+    }
+    
     gameState.enemies.push({
         x: startX,
         y: startY,
         side: side,
-        speed: 1.0 + (gameState.wave * 0.1),
-        maxHp: 20 * Math.pow(1.3, gameState.wave),
-        hp: 20 * Math.pow(1.3, gameState.wave),
-        bounty: 5 + gameState.wave,
+        speed: baseSpeed,
+        maxHp: baseHp,
+        hp: baseHp,
+        bounty: baseBounty,
         reachedEnd: false,
         type: type,
         frameOffset: Math.floor(Math.random() * 4) // Random start frame
